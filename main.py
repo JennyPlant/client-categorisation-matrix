@@ -139,15 +139,15 @@ def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
         fillcolor="lightgreen", opacity=0.15, layer="below", line_width=0
     )
     
-    # Add quadrant labels
-    fig.add_annotation(x=1.75, y=4.25, text="<b>Bronze</b>", showarrow=False, 
-                      font=dict(size=16, color="gray"), bgcolor="white", opacity=0.8)
+    # Add quadrant labels (Gold and Silver in correct positions)
+    fig.add_annotation(x=1.75, y=4.25, text="<b>Gold</b>", showarrow=False, 
+                      font=dict(size=16, color="darkgreen"), bgcolor="white", opacity=0.8)
     fig.add_annotation(x=4.25, y=4.25, text="<b>Platinum</b>", showarrow=False, 
                       font=dict(size=16, color="darkblue"), bgcolor="white", opacity=0.8)
-    fig.add_annotation(x=1.75, y=1.75, text="<b>Silver</b>", showarrow=False, 
+    fig.add_annotation(x=1.75, y=1.75, text="<b>Bronze</b>", showarrow=False, 
+                      font=dict(size=16, color="#8B4513"), bgcolor="white", opacity=0.8)
+    fig.add_annotation(x=4.25, y=1.75, text="<b>Silver</b>", showarrow=False, 
                       font=dict(size=16, color="gray"), bgcolor="white", opacity=0.8)
-    fig.add_annotation(x=4.25, y=1.75, text="<b>Gold</b>", showarrow=False, 
-                      font=dict(size=16, color="darkgreen"), bgcolor="white", opacity=0.8)
     
     # Add reference lines (dividing quadrants)
     fig.add_vline(x=3, line_dash="solid", line_color="darkgray", line_width=2, opacity=0.7)
@@ -170,7 +170,7 @@ def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
                 standoff=40
             ),
             side="bottom",
-            showline=True,
+            showline=False,  # Hide default line so we can draw custom arrow
             linecolor="black",
             linewidth=3,
             mirror=False,
@@ -184,12 +184,12 @@ def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
             gridcolor="lightgray",
             gridwidth=1,
             title=dict(
-                text="<b>STRATEGIC IMPORTANCE</b><br>(how important is this account to the agency?)",
+                text="<b>GROWTH POTENTIAL</b><br>(how important is this account to the agency?)",
                 font=dict(size=12, color="darkgray"),
                 standoff=60
             ),
             side="left",
-            showline=True,
+            showline=False,  # Hide default line so we can draw custom arrow
             linecolor="black",
             linewidth=3,
             mirror=False,
@@ -218,27 +218,31 @@ def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
         margin=dict(l=120, r=120, t=80, b=120)
     )
     
-    # Add custom axis arrows using shapes and annotations
-    # X-axis arrow (horizontal)
+    # Add custom axis arrows using shapes
+    # X-axis line and arrow
     fig.add_shape(
-        type="line", x0=0.5, y0=0.5, x1=5.5, y1=0.5,
+        type="line", x0=0.5, y0=0.5, x1=5.4, y1=0.5,
         line=dict(color="black", width=3)
     )
-    fig.add_annotation(
-        x=5.5, y=0.5, text="", showarrow=True,
-        arrowhead=2, arrowsize=2, arrowwidth=3, arrowcolor="black",
-        ax=5.3, ay=0.5
+    # X-axis arrowhead (triangle)
+    fig.add_shape(
+        type="path",
+        path="M 5.4,0.5 L 5.2,0.6 L 5.2,0.4 Z",
+        fillcolor="black",
+        line=dict(color="black", width=0)
     )
     
-    # Y-axis arrow (vertical)
+    # Y-axis line and arrow  
     fig.add_shape(
-        type="line", x0=0.5, y0=0.5, x1=0.5, y1=5.5,
+        type="line", x0=0.5, y0=0.5, x1=0.5, y1=5.4,
         line=dict(color="black", width=3)
     )
-    fig.add_annotation(
-        x=0.5, y=5.5, text="", showarrow=True,
-        arrowhead=2, arrowsize=2, arrowwidth=3, arrowcolor="black",
-        ax=0.5, ay=5.3
+    # Y-axis arrowhead (triangle)
+    fig.add_shape(
+        type="path",
+        path="M 0.5,5.4 L 0.4,5.2 L 0.6,5.2 Z",
+        fillcolor="black",
+        line=dict(color="black", width=0)
     )
     
     # Add axis labels with positioning
@@ -262,7 +266,7 @@ def create_scatter_plot(df: pd.DataFrame) -> go.Figure:
     # Update hover template
     fig.update_traces(
         hovertemplate="<b>%{customdata[0]}</b><br>" +
-                      "Strategic Importance: %{y}<br>" +
+                      "Growth Potential: %{y}<br>" +
                       "Spend Potential: %{x}<br>" +
                       "Relationship Risk: %{customdata[3]}<br>" +
                       "FY25 Revenue: £%{customdata[4]:,.0f}<br>" +
@@ -377,8 +381,8 @@ def main():
                 st.metric("High Risk Clients", high_risk_count)
             
             with col4:
-                avg_strategic_importance = df['Strategic_Importance_(1-5)'].mean()
-                st.metric("Avg Strategic Importance", f"{avg_strategic_importance:.1f}")
+                avg_growth_potential = df['Strategic_Importance_(1-5)'].mean()
+                st.metric("Avg Growth Potential", f"{avg_growth_potential:.1f}")
             
             # Risk distribution
             st.markdown("**Risk Level Distribution:**")
